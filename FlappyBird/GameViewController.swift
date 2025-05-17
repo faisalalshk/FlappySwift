@@ -10,15 +10,12 @@ import UIKit
 import SpriteKit
 
 extension SKNode {
-    class func unarchiveFromFile(file : NSString) -> SKNode? {
-        
-        let path = NSBundle.mainBundle().pathForResource(file, ofType: "sks")
-        
-        var sceneData = NSData.dataWithContentsOfFile(path, options: .DataReadingMappedIfSafe, error: nil)
-        var archiver = NSKeyedUnarchiver(forReadingWithData: sceneData)
-        
+    class func unarchiveFromFile(_ file: String) -> SKNode? {
+        guard let path = Bundle.main.path(forResource: file, ofType: "sks") else { return nil }
+        guard let sceneData = try? Data(contentsOf: URL(fileURLWithPath: path), options: .mappedIfSafe) else { return nil }
+        let archiver = NSKeyedUnarchiver(forReadingWith: sceneData)
         archiver.setClass(self.classForKeyedUnarchiver(), forClassName: "SKScene")
-        let scene = archiver.decodeObjectForKey(NSKeyedArchiveRootObjectKey) as GameScene
+        let scene = archiver.decodeObject(forKey: NSKeyedArchiveRootObjectKey) as? GameScene
         archiver.finishDecoding()
         return scene
     }
@@ -31,7 +28,7 @@ class GameViewController: UIViewController {
 
         if let scene = GameScene.unarchiveFromFile("GameScene") as? GameScene {
             // Configure the view.
-            let skView = self.view as SKView
+            let skView = self.view as! SKView
             skView.showsFPS = true
             skView.showsNodeCount = true
             
@@ -39,27 +36,22 @@ class GameViewController: UIViewController {
             skView.ignoresSiblingOrder = true
             
             /* Set the scale mode to scale to fit the window */
-            scene.scaleMode = .AspectFill
+            scene.scaleMode = .aspectFill
             
             skView.presentScene(scene)
         }
     }
 
-    override func shouldAutorotate() -> Bool {
+    override var shouldAutorotate: Bool {
         return true
     }
 
-    override func supportedInterfaceOrientations() -> Int {
-        if UIDevice.currentDevice().userInterfaceIdiom == .Phone {
-            return Int(UIInterfaceOrientationMask.AllButUpsideDown.toRaw())
+    override var supportedInterfaceOrientations: UIInterfaceOrientationMask {
+        if UIDevice.current.userInterfaceIdiom == .phone {
+            return .allButUpsideDown
         } else {
-            return Int(UIInterfaceOrientationMask.All.toRaw())
+            return .all
         }
-    }
-
-    override func didReceiveMemoryWarning() {
-        super.didReceiveMemoryWarning()
-        // Release any cached data, images, etc that aren't in use.
     }
     
 }

@@ -1,6 +1,6 @@
 # FlappySwift
 
-An implementation of Flappy Bird in Swift for iOS 8.
+An implementation of Flappy Bird using SwiftUI and SpriteKit for modern iOS.
 
 ![FlappySwift](http://i.imgur.com/1NLoToU.gif)
 
